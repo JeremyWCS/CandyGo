@@ -81,10 +81,10 @@ public class ProfilActivity extends AppCompatActivity {
         if(pdBonbon>0 && pdBonbon<=50){
             Drawable image1 = ContextCompat.getDrawable(getApplicationContext(), R.drawable.petite_citrouille);
             ivPoids.setImageDrawable(image1);
-        } else if (pdBonbon>0 && pdBonbon<=200){
+        } else if (pdBonbon>50 && pdBonbon<=500){
             Drawable image2 = ContextCompat.getDrawable(getApplicationContext(), R.drawable.moy_citrouille);
             ivPoids.setImageDrawable(image2);
-        } else if (pdBonbon>0 && pdBonbon<=400){
+        } else if (pdBonbon>500 && pdBonbon<=1000){
             Drawable image3 = ContextCompat.getDrawable(getApplicationContext(), R.drawable.grosse_citrouille);
             ivPoids.setImageDrawable(image3);
         }
