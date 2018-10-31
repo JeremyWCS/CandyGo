@@ -1,12 +1,12 @@
 package fr.edouardkerhir.geolocmap;
 
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -39,7 +39,13 @@ public class ProfilActivity extends AppCompatActivity {
             return false;
         }
     };
+    private String jsonUser;
 
+
+    private TextView tv_nbBonbon;
+    private TextView tv_pdBonbon;
+    private TextView tvLevel;
+    private EditText etpseudo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,39 +56,21 @@ public class ProfilActivity extends AppCompatActivity {
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
 
-        final SharedPreferences  mPrefs = getPreferences(MODE_PRIVATE);
+        tv_nbBonbon = findViewById(R.id.tv_nbBonbon);
+        tv_pdBonbon = findViewById(R.id.tv_pdBonbon);
+        tvLevel = findViewById(R.id.tv_level);
 
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         Gson gson = new Gson();
-        final String json = mPrefs.getString("MyObject", "");
-        final UserModel user = gson.fromJson(json, UserModel.class);
-        final EditText etpseudo = findViewById(R.id.et_pseudo);
+        jsonUser = sharedPreferences.getString("currentUser", null);
+        UserModel userModel = gson.fromJson(jsonUser, UserModel.class);
 
-        TextView tv_nbBonbon = findViewById(R.id.tv_nbBonbon);
-        TextView tv_pdBonbon = findViewById(R.id.tv_pdBonbon);
-        TextView tvLevel = findViewById(R.id.tv_level);
-
-        /*if (user.getNom() != null) {
-            etpseudo.setText(user.getNom());
-            tvLevel.setText(user.getLevel());
-            int nbBonbon = user.getCandy();
-            double pdBonbon = user.getPoid();
-            tv_nbBonbon.setText("Vous avez "+nbBonbon+" bonbons!");
-            tv_pdBonbon.setText("Vous avez un poids de "+nbBonbon+"g de bonbons!");
-        }
-
-
-        Button btUpdate = findViewById(R.id.bt_update);
-        btUpdate.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-                String pseudo = etpseudo.getText().toString();
-                user.setNom(pseudo);
-                SharedPreferences.Editor prefsEditor = mPrefs.edit();
-                prefsEditor.putString("user", json);
-                prefsEditor.commit();
-            }
-        });
+        userModel.setLevel(getlevelUser(userModel.getCandy()));
+        tvLevel.setText("Level : "+String.valueOf(userModel.getLevel()));
+        int nbBonbon = userModel.getCandy();
+        double pdBonbon = userModel.getPoid();
+        tv_nbBonbon.setText("Vous avez " + nbBonbon + " bonbons!");
+        tv_pdBonbon.setText("Vous avez un poids de " + pdBonbon + "g de bonbons!");
 
         Button btCitrouille = findViewById(R.id.bt_citrouille);
         btCitrouille.setOnClickListener(new View.OnClickListener() {
@@ -92,39 +80,37 @@ public class ProfilActivity extends AppCompatActivity {
                         CitrouilleListActivity.class);
                 startActivity(goToCitrouilleList);
             }
-        });*/
-
-
+        });
     }
 
-    /*public int getlevelUser(){
-        UserModel user = new UserModel();
-        int nbCandy = user.getCandy();
+
+    public int getlevelUser(int nbCandy){
+
         int level = 0;
 
-        if (nbCandy<10){
+        if (nbCandy < 20) {
             level = 0;
-        } else if (nbCandy>10 && nbCandy<20) {
+        } else if (nbCandy > 20 && nbCandy < 30) {
             level = 1;
-        } else if (nbCandy>20 && nbCandy<30) {
+        } else if (nbCandy > 30 && nbCandy < 40) {
             level = 3;
-        } else if (nbCandy>30 && nbCandy<40) {
+        } else if (nbCandy > 40 && nbCandy < 50) {
             level = 4;
-        } else if (nbCandy>40 && nbCandy<50) {
+        } else if (nbCandy > 50 && nbCandy < 60) {
             level = 5;
-        } else if (nbCandy>50 && nbCandy<60) {
+        } else if (nbCandy > 60 && nbCandy < 75) {
             level = 6;
-        } else if (nbCandy>60 && nbCandy<70) {
+        } else if (nbCandy > 75 && nbCandy < 90) {
             level = 7;
-        } else if (nbCandy>70 && nbCandy<80) {
+        } else if (nbCandy > 90 && nbCandy < 105) {
             level = 8;
-        } else if (nbCandy>80 && nbCandy<90) {
+        } else if (nbCandy > 105 && nbCandy < 120) {
             level = 9;
-        } else if (nbCandy>90 && nbCandy<100) {
+        } else if (nbCandy > 120 && nbCandy < 140) {
             level = 10;
-        } else if (nbCandy>100) {
+        } else if (nbCandy > 140) {
             level = 11;
         }
-        return  level;
-    }*/
+        return level;
+    }
 }

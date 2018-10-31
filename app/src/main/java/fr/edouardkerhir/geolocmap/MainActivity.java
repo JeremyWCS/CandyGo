@@ -4,21 +4,20 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
-
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Point;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.util.Log;
 import android.view.Display;
 import android.view.Gravity;
@@ -26,7 +25,6 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.ListPopupWindow;
 import android.widget.ListView;
 import android.widget.PopupWindow;
@@ -40,14 +38,11 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.maps.CameraUpdate;
-import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
-import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.UiSettings;
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
@@ -59,11 +54,12 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.gson.Gson;
-
+import com.google.gson.reflect.TypeToken;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
@@ -88,6 +84,9 @@ public class MainActivity extends AppCompatActivity {
     private RequestQueue requestQueue;
     private float mZoom;
     private ArrayList<Marker> mMarkers;
+    private UserModel user = new UserModel();
+    private String placeAdressJsonString;
+    String userJson;
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -95,7 +94,6 @@ public class MainActivity extends AppCompatActivity {
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
             switch (item.getItemId()) {
                 case R.id.navigation_home:
-
                     return true;
                 case R.id.navigation_dashboard:
                     Intent goToProfil = new Intent(MainActivity.this, ProfilActivity.class);
@@ -113,12 +111,36 @@ public class MainActivity extends AppCompatActivity {
     //Création de l'activity.
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        mZoom = 18.0f;
+        mZoom = 17.0f;
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+
+        //create shared pref object
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        //create gson object
+        Gson gson = new Gson();
+        //convert userModel into string
+
+        userJson = sharedPreferences.getString("currentUser", "");
+
+        if(!userJson.isEmpty()){
+            UserModel user = gson.fromJson(userJson, UserModel.class);
+
+        }
+        else{
+            UserModel user = new UserModel();
+            userJson = gson.toJson(user);
+            editor.putString("currentUser", userJson);
+            editor.commit();
+        }
+
+
 
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
+
+        placeAdressJsonString = sharedPreferences.getString("placesJson", "");
 
         requestQueue = Volley.newRequestQueue(this);
         placesAdresses = new ArrayList<>();
@@ -152,7 +174,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     // checkPermission : nom epxlicite. Permet de vérifier les permission GPS. si les autorisations sont là, lance initLocation. Sinon demande les autorisations.
-    public void checkPermission(){
+    public void checkPermission() {
         if (ContextCompat.checkSelfPermission(MainActivity.this,
                 Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
@@ -179,7 +201,7 @@ public class MainActivity extends AppCompatActivity {
             }
         } else {
 
-           initLocation();
+            initLocation();
 
         }
 
@@ -198,61 +220,61 @@ public class MainActivity extends AppCompatActivity {
 
     //initLocation : lance la gélocalisation après check des permissions GPS, si toutes les permissions sont accordées
     @SuppressLint({"Missing Permission", "MissingPermission"})
-    public void initLocation(){
-            superMap.setMyLocationEnabled(true); // position de l'utilisateur sur la carte
+    public void initLocation() {
+        superMap.setMyLocationEnabled(true); // position de l'utilisateur sur la carte
 
-            // récupération de la dernière position connue de l'utilisateur
-            mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
-            mFusedLocationClient.getLastLocation()
-                    .addOnSuccessListener(this, new OnSuccessListener<Location>() {
-                        @Override
-                        public void onSuccess(Location location) {
-                            // Got last known location. In some rare situations this can be null.
-                            if (location != null) {
-                                // Logic to handle location object
-                                LatLng latLong = new LatLng(location.getLatitude(), location.getLongitude());
-                                CameraPosition cameraPosition = new CameraPosition.Builder()
-                                        .target(latLong) // Sets the center of the map to
-                                        .zoom(mZoom)                   // Sets the zoom
-                                        .bearing(0.0f) // Sets the orientation of the camera to east
-                                        .tilt(70.0f)    // Sets the tilt of the camera to 30 degrees
-                                        .build();    // Creates a CameraPosition from the builder
-                                superMap.animateCamera(CameraUpdateFactory.newCameraPosition(
-                                        cameraPosition));
-                                url = "https://api-adresse.data.gouv.fr/search/?q=citycode=31555&lng="+location.getLongitude()+"&lat="+location.getLatitude()+"&type=housenumber&limit=500";
-                                requeteAPI(url);
-                                //moveCamera(location);
-                                userLocation = location;
-                            }
+        // récupération de la dernière position connue de l'utilisateur
+        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+        mFusedLocationClient.getLastLocation()
+                .addOnSuccessListener(this, new OnSuccessListener<Location>() {
+                    @Override
+                    public void onSuccess(Location location) {
+                        // Got last known location. In some rare situations this can be null.
+                        if (location != null) {
+                            // Logic to handle location object
+                            LatLng latLong = new LatLng(location.getLatitude(), location.getLongitude());
+                            CameraPosition cameraPosition = new CameraPosition.Builder()
+                                    .target(latLong) // Sets the center of the map to
+                                    .zoom(mZoom)                   // Sets the zoom
+                                    .bearing(0.0f) // Sets the orientation of the camera to east
+                                    .tilt(70.0f)    // Sets the tilt of the camera to 30 degrees
+                                    .build();    // Creates a CameraPosition from the builder
+                            superMap.animateCamera(CameraUpdateFactory.newCameraPosition(
+                                    cameraPosition));
+                            url = "https://api-adresse.data.gouv.fr/search/?q=citycode=31555&lng=" + location.getLongitude() + "&lat=" + location.getLatitude() + "&type=housenumber&limit=500";
+                            requeteAPI(url);
+                            //moveCamera(location);
+                            userLocation = location;
                         }
-                    });
+                    }
+                });
 
-            // modification de la position si l'utilisateur se déplace
-            mLocationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
-            final LocationListener locationListener = new LocationListener() {
-                public void onLocationChanged(Location location) {
-                    userLocation = location;
-                    moveCamera(location);
-                }
+        // modification de la position si l'utilisateur se déplace
+        mLocationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+        final LocationListener locationListener = new LocationListener() {
+            public void onLocationChanged(Location location) {
+                userLocation = location;
+                moveCamera(location);
+            }
 
-                public void onStatusChanged(String provider, int status, Bundle extras) {
-                    //méthode appelée au changement de status lors du déroulement de l'activité.
-                }
+            public void onStatusChanged(String provider, int status, Bundle extras) {
+                //méthode appelée au changement de status lors du déroulement de l'activité.
+            }
 
-                public void onProviderEnabled(String provider) {
-                    //Méthode appelée lorsque l'activité est lancée et que le bonhomme désactive son gps durant le déroulement de l'activité. le con.
-                }
+            public void onProviderEnabled(String provider) {
+                //Méthode appelée lorsque l'activité est lancée et que le bonhomme désactive son gps durant le déroulement de l'activité. le con.
+            }
 
-                public void onProviderDisabled(String provider) {
-                    //Méthode appelée lorsque l'activité est lancée et que le bonhomme active son gps durant le déroulement de l'activité. Habile.
-                }
-            };
-            // initialisation de la vérification du déplacement par GPS et par réseau WIFI
-            mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
-            mLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationListener);
-        }
+            public void onProviderDisabled(String provider) {
+                //Méthode appelée lorsque l'activité est lancée et que le bonhomme active son gps durant le déroulement de l'activité. Habile.
+            }
+        };
+        // initialisation de la vérification du déplacement par GPS et par réseau WIFI
+        mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
+        mLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationListener);
+    }
 
-    public void createMap(MapView map){
+    public void createMap(MapView map) {
 
         map.onResume();
         map.getMapAsync(new OnMapReadyCallback() {
@@ -295,7 +317,7 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    public void requeteAPI(String urlRequete){
+    public void requeteAPI(String urlRequete) {
         // Création de la requête vers l'API, ajout des écouteurs pour les réponses et erreurs possibles
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
                 Request.Method.GET, urlRequete, null,
@@ -315,17 +337,41 @@ public class MainActivity extends AppCompatActivity {
                                 String adress = properties.getString("label");
                                 double longitude = coordinates.getDouble(0);
                                 double latitude = coordinates.getDouble(1);
-                                int nbCandy = (int) (Math.random()*4+1);
+                                int nbCandy = (int) (Math.random() * 4 + 1);
                                 ArrayList<bonbonItemInfoWindow> candyThisPlace = new ArrayList<>();
+                                int levelPlace = (int) (Math.random()*3+1);
+                                int index = 0;
                                 for (int j=0; j<nbCandy; j++){
-                                    int index = (int) (Math.random()*9+1);
+                                    switch(nbCandy){
+                                        case 1: index = (int) (Math.random()*9+1); break;
+                                        case 2: index = (int) (Math.random()*9+1); break;
+                                        case 3: index = (int) (Math.random()*9+1); break;
+                                    }
                                     int nbForIndex = (int) (Math.random()*3+2);
                                     candyThisPlace.add(new bonbonItemInfoWindow(index, nbForIndex));
                                 }
-
-                                placesAdresses.add(new Places(name, adress, longitude, latitude, nbCandy, candyThisPlace));
+                                placesAdresses.add(new Places(name, adress, longitude, latitude, nbCandy, candyThisPlace, levelPlace));
                             }
-                            createMarkers(placesAdresses);
+                            SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(MainActivity.this);
+                            SharedPreferences.Editor editor = sharedPreferences.edit();
+                            editor.putInt("placesJsonNb", placesAdresses.size());
+                            Gson gson = new Gson();
+
+                            if (placeAdressJsonString.isEmpty()) {
+                                placeAdressJsonString = gson.toJson(placesAdresses);
+                                editor = sharedPreferences.edit();
+                                editor.putString("placesJson", placeAdressJsonString);
+                                editor.commit();
+                                createMarkers(placesAdresses);
+                            } else {
+
+                                Type listType = new TypeToken<ArrayList<Places>>() {
+                                }.getType();
+                                placesAdresses = (gson.fromJson(placeAdressJsonString, listType));
+                                boolean bool = true;
+                                createMarkers(placesAdresses);
+                            }
+
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
@@ -341,7 +387,6 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
         );
-
         // On ajoute la requête à la file d'attente
         requestQueue.add(jsonObjectRequest);
     }
@@ -353,7 +398,24 @@ public class MainActivity extends AppCompatActivity {
             MarkerOptions markerOptions = new MarkerOptions();
             markerOptions.position(PlacePosition);
             Marker marker = superMap.addMarker(markerOptions);
+
             BitmapDescriptor icon = BitmapDescriptorFactory.fromResource(R.drawable.candyiconcolor);
+            if(!thisPlace.isVisited()){
+                switch(thisPlace.getLevel()){
+                    case 1:
+                        icon = BitmapDescriptorFactory.fromResource(R.drawable.candyiconbronze);
+                        break;
+                    case 2:
+                        icon = BitmapDescriptorFactory.fromResource(R.drawable.candyicongrey);
+                        break;
+                    case 3:
+                        icon = BitmapDescriptorFactory.fromResource(R.drawable.candyicongold);
+                        break;
+                }
+            }
+            else {
+                icon = BitmapDescriptorFactory.fromResource(R.drawable.candyiconblur);
+            }
             marker.setIcon(icon);
             marker.setTag(thisPlace);
             mMarkers.add(marker);
@@ -399,7 +461,7 @@ public class MainActivity extends AppCompatActivity {
         candyList.setAdapter(adapter);
         final Button getCandy = popUpView.findViewById(R.id.button_get_candy);
 
-        if (place.isVisited()){
+        if (place.isVisited()) {
             getCandy.setText("tu as déjà récupéré ces bonbons fdp!");
         }
 
@@ -407,15 +469,44 @@ public class MainActivity extends AppCompatActivity {
         getCandy.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                if (place.isVisited()) {
+                SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(MainActivity.this);
+                Gson gson = new Gson();
+                String currentUser = sharedPreferences.getString("currentUser", null);
+                UserModel user = gson.fromJson(currentUser, UserModel.class);
+                //user.setLevel(getlevelUser());
+                if (place.getLevel() == 2 && user.getLevel() < 4) {
+                    Toast.makeText(MainActivity.this, "Niveau 4 nécessaire !", Toast.LENGTH_LONG).show();
+                    popUp.dismiss();
+                }else if(place.getLevel() == 3 && user.getLevel() < 9) {
+                    Toast.makeText(MainActivity.this, "Niveau 9 nécessaire !", Toast.LENGTH_LONG).show();
+                    popUp.dismiss();
+                }else if(place.isVisited()) {
 
                 } else {
                     if (getDistanceFromMarker(marker) < DISTANCE_POUR_CHOPPER_LES_BONBONS) {
                         Toast.makeText(MainActivity.this, "Tu es suffisament proche !", Toast.LENGTH_LONG).show();
-                        BitmapDescriptor icon = BitmapDescriptorFactory.fromResource(R.drawable.candyicongrey);
-                        marker.setIcon(icon);
+                        BitmapDescriptor icon = BitmapDescriptorFactory.fromResource(R.drawable.candyiconblur);
+                        marker.setIcon(null);
                         place.setVisited(true);
+                        placeAdressJsonString = gson.toJson(placesAdresses);
+                        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(MainActivity.this);
+                        SharedPreferences.Editor editor = sharedPreferences.edit();
+                        editor = sharedPreferences.edit();
+                        editor.putString("placesJson", placeAdressJsonString);
+                        editor.commit();
+                        for (int i = 0; i<place.getCandyPlaces().size(); i++){
+                            int indexSingleton = place.getCandyPlaces().get(i).getIndexSingleton();
+                            int numberOfEach = place.getCandyPlaces().get(i).getNbEachCandy();
+                            user.setCandy(user.getCandy()+numberOfEach);
+                            ArrayList<CandyModel> tempArray = user.getUsersCandies();
+                            tempArray.get(indexSingleton).setNbCandy(tempArray.get(indexSingleton).getNbCandy()+numberOfEach);
+                            user.setUsersCandies(tempArray);
+                            userJson = gson.toJson(user);
+                            editor.putString("currentUser", userJson);
+                            editor.commit();
+                        }
+
+
                     } else {
                         Toast.makeText(MainActivity.this, "Tu es trop loin !", Toast.LENGTH_LONG).show();
                     }
@@ -424,8 +515,40 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
+    public int getlevelUser() {
 
-    public float getDistanceFromMarker(Marker marker){
+        UserModel user = new UserModel();
+        int nbCandy = user.getCandy();
+        int level = 0;
+
+        if (nbCandy < 20) {
+            level = 0;
+        } else if (nbCandy > 20 && nbCandy < 30) {
+            level = 1;
+        } else if (nbCandy > 30 && nbCandy < 40) {
+            level = 3;
+        } else if (nbCandy > 40 && nbCandy < 50) {
+            level = 4;
+        } else if (nbCandy > 50 && nbCandy < 60) {
+            level = 5;
+        } else if (nbCandy > 60 && nbCandy < 75) {
+            level = 6;
+        } else if (nbCandy > 75 && nbCandy < 90) {
+            level = 7;
+        } else if (nbCandy > 90 && nbCandy < 105) {
+            level = 8;
+        } else if (nbCandy > 105 && nbCandy < 120) {
+            level = 9;
+        } else if (nbCandy > 120 && nbCandy < 140) {
+            level = 10;
+        } else if (nbCandy > 140) {
+            level = 11;
+        }
+        return level;
+    }
+
+
+    public float getDistanceFromMarker(Marker marker) {
         float distance;
         Places thisPlace = (Places) marker.getTag();
         Location thisPlaceLocation = new Location("");
@@ -435,4 +558,8 @@ public class MainActivity extends AppCompatActivity {
 
         return distance;
     }
+
+
 }
+
+
