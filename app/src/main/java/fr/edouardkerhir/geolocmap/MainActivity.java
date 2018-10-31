@@ -55,7 +55,6 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -85,6 +84,7 @@ public class MainActivity extends AppCompatActivity {
     private RequestQueue requestQueue;
     private float mZoom;
     private ArrayList<Marker> mMarkers;
+    private UserModel user = new UserModel();
     private String placeAdressJsonString;
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -109,15 +109,25 @@ public class MainActivity extends AppCompatActivity {
     //Création de l'activity.
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        mZoom = 18.0f;
+        mZoom = 17.0f;
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+
+        //create shared pref object
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        //create gson object
+        Gson gson = new Gson();
+        //convert userModel into string
+        UserModel userModel = new UserModel();
+        String user = gson.toJson(userModel);
+        editor.putString("currentUser", user);
+        editor.commit();
+
 
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
 
-
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         placeAdressJsonString = sharedPreferences.getString("placesJson", "");
 
         requestQueue = Volley.newRequestQueue(this);
