@@ -10,6 +10,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 
 import com.google.gson.Gson;
@@ -38,11 +39,13 @@ public class ProfilActivity extends AppCompatActivity {
             return false;
         }
     };
+    private String jsonUser;
 
 
     private TextView tv_nbBonbon;
     private TextView tv_pdBonbon;
     private TextView tvLevel;
+    private EditText etpseudo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,8 +62,8 @@ public class ProfilActivity extends AppCompatActivity {
 
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         Gson gson = new Gson();
-        String currentUser = sharedPreferences.getString("currentUser", null);
-        UserModel userModel = gson.fromJson(currentUser, UserModel.class);
+        jsonUser = sharedPreferences.getString("currentUser", null);
+        UserModel userModel = gson.fromJson(jsonUser, UserModel.class);
 
         userModel.setLevel(getlevelUser(userModel.getCandy()));
         tvLevel.setText("Level : "+String.valueOf(userModel.getLevel()));
@@ -68,31 +71,6 @@ public class ProfilActivity extends AppCompatActivity {
         double pdBonbon = userModel.getPoid();
         tv_nbBonbon.setText("Vous avez " + nbBonbon + " bonbons!");
         tv_pdBonbon.setText("Vous avez un poids de " + pdBonbon + "g de bonbons!");
-
-        /*switch (userModel.getLevel()){
-            case "":
-                break;
-            case "":
-                break;
-            case "":
-                break;
-            case "":
-                break;
-            case "":
-                break;
-            case "":
-                break;
-            case "":
-                break;
-            case "":
-                break;
-            case "":
-                break;
-            case "":
-                break;
-            case "":
-                break;
-        }*/
 
         Button btCitrouille = findViewById(R.id.bt_citrouille);
         btCitrouille.setOnClickListener(new View.OnClickListener() {

@@ -86,6 +86,7 @@ public class MainActivity extends AppCompatActivity {
     private ArrayList<Marker> mMarkers;
     private UserModel user = new UserModel();
     private String placeAdressJsonString;
+    String userJson;
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -120,10 +121,20 @@ public class MainActivity extends AppCompatActivity {
         //create gson object
         Gson gson = new Gson();
         //convert userModel into string
-        UserModel userModel = new UserModel();
-        String user = gson.toJson(userModel);
-        editor.putString("currentUser", user);
-        editor.commit();
+
+        userJson = sharedPreferences.getString("currentUser", "");
+
+        if(!userJson.isEmpty()){
+            UserModel user = gson.fromJson(userJson, UserModel.class);
+
+        }
+        else{
+            UserModel user = new UserModel();
+            userJson = gson.toJson(user);
+            editor.putString("currentUser", userJson);
+            editor.commit();
+        }
+
 
 
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
@@ -461,13 +472,13 @@ public class MainActivity extends AppCompatActivity {
                 SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(MainActivity.this);
                 Gson gson = new Gson();
                 String currentUser = sharedPreferences.getString("currentUser", null);
-                UserModel userModel = gson.fromJson(currentUser, UserModel.class);
-                userModel.setLevel(getlevelUser());
-                if (place.getLevel() == 2 && userModel.getLevel() < 4) {
-                    Toast.makeText(MainActivity.this, "Pas le level !", Toast.LENGTH_LONG).show();
+                UserModel user = gson.fromJson(currentUser, UserModel.class);
+                //user.setLevel(getlevelUser());
+                if (place.getLevel() == 2 && user.getLevel() < 4) {
+                    Toast.makeText(MainActivity.this, "Niveau 4 nécessaire !", Toast.LENGTH_LONG).show();
                     popUp.dismiss();
-                }else if(place.getLevel() == 3 && userModel.getLevel() < 9) {
-                    Toast.makeText(MainActivity.this, "Pas le level !", Toast.LENGTH_LONG).show();
+                }else if(place.getLevel() == 3 && user.getLevel() < 9) {
+                    Toast.makeText(MainActivity.this, "Niveau 9 nécessaire !", Toast.LENGTH_LONG).show();
                     popUp.dismiss();
                 }else if(place.isVisited()) {
 
@@ -475,7 +486,7 @@ public class MainActivity extends AppCompatActivity {
                     if (getDistanceFromMarker(marker) < DISTANCE_POUR_CHOPPER_LES_BONBONS) {
                         Toast.makeText(MainActivity.this, "Tu es suffisament proche !", Toast.LENGTH_LONG).show();
                         BitmapDescriptor icon = BitmapDescriptorFactory.fromResource(R.drawable.candyiconblur);
-                        marker.setIcon(icon);
+                        marker.setIcon(null);
                         place.setVisited(true);
                         placeAdressJsonString = gson.toJson(placesAdresses);
                         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(MainActivity.this);
@@ -483,6 +494,18 @@ public class MainActivity extends AppCompatActivity {
                         editor = sharedPreferences.edit();
                         editor.putString("placesJson", placeAdressJsonString);
                         editor.commit();
+                        for (int i = 0; i<place.getCandyPlaces().size(); i++){
+                            int indexSingleton = place.getCandyPlaces().get(i).getIndexSingleton();
+                            int numberOfEach = place.getCandyPlaces().get(i).getNbEachCandy();
+                            user.setCandy(user.getCandy()+numberOfEach);
+                            ArrayList<CandyModel> tempArray = user.getUsersCandies();
+                            tempArray.get(indexSingleton).setNbCandy(tempArray.get(indexSingleton).getNbCandy()+numberOfEach);
+                            user.setUsersCandies(tempArray);
+                            userJson = gson.toJson(user);
+                            editor.putString("currentUser", userJson);
+                            editor.commit();
+                        }
+
 
                     } else {
                         Toast.makeText(MainActivity.this, "Tu es trop loin !", Toast.LENGTH_LONG).show();
