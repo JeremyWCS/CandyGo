@@ -53,9 +53,20 @@ public class CitrouilleListActivity extends AppCompatActivity {
         UserModel userModel = gson.fromJson(currentUser, UserModel.class);
 
         ListView listView = findViewById(R.id.lv_citrouille);
-        ArrayList<CandyModel> citrouille = userModel.getUsersCandies();
+        if (userModel.getLevel() < 4) {
+            ArrayList<CandyModel> citrouille = userModel.getUsersCandies();
+            CitrouilleAdapter adapter = new CitrouilleAdapter(this, citrouille);
+            listView.setAdapter(adapter);
+        }else if (userModel.getLevel() < 9) {
+            ArrayList<CandyModel> citrouille = userModel.getUsersCandies1();
+            CitrouilleAdapter adapter = new CitrouilleAdapter(this, citrouille);
+            listView.setAdapter(adapter);
+        }else {
+            ArrayList<CandyModel> citrouille = userModel.getUsersCandies2();
+            CitrouilleAdapter adapter = new CitrouilleAdapter(this, citrouille);
+            listView.setAdapter(adapter);
+        }
 
-        CitrouilleAdapter adapter = new CitrouilleAdapter(this, citrouille);
-        listView.setAdapter(adapter);
+
     }
 }
