@@ -472,7 +472,7 @@ public class MainActivity extends AppCompatActivity {
                 Gson gson = new Gson();
                 String currentUser = sharedPreferences.getString("currentUser", null);
                 UserModel user = gson.fromJson(currentUser, UserModel.class);
-                user.setLevel(user.getCandy());
+                user.setLevel(getlevelUser(user.getCandy()));
                 if (place.getLevel() == 2 && user.getLevel() < 4) {
                     Toast.makeText(MainActivity.this, "Niveau 4 nécessaire !", Toast.LENGTH_LONG).show();
                     popUp.dismiss();

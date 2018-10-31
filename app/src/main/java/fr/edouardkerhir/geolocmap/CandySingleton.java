@@ -64,7 +64,4 @@ class CandySingleton {
 
         return CandyArrayList;
     }
-
-
-
 }
