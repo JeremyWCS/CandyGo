@@ -10,6 +10,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.google.gson.Gson;
@@ -54,6 +55,8 @@ public class ProfilActivity extends AppCompatActivity {
         tv_nbBonbon = findViewById(R.id.tv_nbBonbon);
         tv_pdBonbon = findViewById(R.id.tv_pdBonbon);
         tvLevel = findViewById(R.id.tv_level);
+        ImageView imageLevel = findViewById(R.id.iv_candy);
+
 
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         Gson gson = new Gson();
@@ -66,31 +69,7 @@ public class ProfilActivity extends AppCompatActivity {
         double pdBonbon = userModel.getPoid();
         tv_nbBonbon.setText("Vous avez " + nbBonbon + " bonbons!");
         tv_pdBonbon.setText("Vous avez un poids de " + pdBonbon + "g de bonbons!");
-
-        /*switch (userModel.getLevel()){
-            case "":
-                break;
-            case "":
-                break;
-            case "":
-                break;
-            case "":
-                break;
-            case "":
-                break;
-            case "":
-                break;
-            case "":
-                break;
-            case "":
-                break;
-            case "":
-                break;
-            case "":
-                break;
-            case "":
-                break;
-        }*/
+        tvLevel.setText(String.valueOf(userModel.getLevel()));
 
         Button btCitrouille = findViewById(R.id.bt_citrouille);
         btCitrouille.setOnClickListener(new View.OnClickListener() {
@@ -101,8 +80,6 @@ public class ProfilActivity extends AppCompatActivity {
                 startActivity(goToCitrouilleList);
             }
         });
-
-
     }
 
     public int getlevelUser(int nbCandy){
