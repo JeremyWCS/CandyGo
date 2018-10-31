@@ -4,7 +4,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/item_background"
     android:padding="10dp">
 
 
@@ -27,7 +26,7 @@
             android:ems="10"
             android:gravity="center"
             android:inputType="date"
-            android:textColor="@android:color/white"
+            android:textColor="@color/orangeApp"
             android:textSize="24sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -51,8 +50,7 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_bias="1.0" />
 
-        <de.hdodenhof.circleimageview.CircleImageView
-            xmlns:app="http://schemas.android.com/apk/res-auto"
+        <de.hdodenhof.circleimageview.CircleImageView xmlns:app="http://schemas.android.com/apk/res-auto"
             android:id="@+id/iv_candy"
             android:layout_width="0dp"
             android:layout_height="0dp"
@@ -64,7 +62,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.96"
             app:layout_constraintStart_toStartOf="@+id/guideline"
-            app:layout_constraintTop_toTopOf="parent"/>
+            app:layout_constraintTop_toTopOf="parent" />
 
         <android.support.constraint.Guideline
             android:id="@+id/guideline"
@@ -82,7 +80,7 @@
         android:layout_alignParentTop="true"
         android:layout_alignParentRight="true"
         android:layout_marginTop="86dp"
-        android:visibility="visible">
+        android:visibility="gone">
 
         <TextView
             android:id="@+id/tv_poid_candy"
@@ -91,7 +89,7 @@
             android:layout_marginTop="8dp"
             android:layout_marginEnd="8dp"
             android:layout_marginBottom="8dp"
-            android:textColor="#fff"
+            android:textColor="@color/orangeApp"
             app:layout_constraintBottom_toTopOf="@+id/guideline2"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -105,7 +103,7 @@
             android:layout_marginTop="8dp"
             android:layout_marginBottom="8dp"
             android:text="Poids d'un bonbon :"
-            android:textColor="@android:color/white"
+            android:textColor="@color/orangeApp"
             app:layout_constraintBottom_toTopOf="@+id/guideline2"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
