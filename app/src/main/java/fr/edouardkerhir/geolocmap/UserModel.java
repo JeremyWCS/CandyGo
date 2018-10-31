@@ -5,14 +5,13 @@ import java.util.ArrayList;
 public class UserModel {
     private double poid = 0.0;
     private int candy = 0;
-    private int level = 0;
+    private int level = 10;
     private ArrayList<CandyModel> usersCandies = initArray();
 
-
-    public UserModel(double poid, int candy,int level, ArrayList usersCandies) {
+    public UserModel(double poid, int candy, ArrayList usersCandies) {
         this.poid = poid;
         this.candy = candy;
-        this.level= level;
+        this.level=10;
         this.usersCandies= usersCandies;
     }
 
