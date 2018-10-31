@@ -1,20 +1,17 @@
 package fr.edouardkerhir.geolocmap;
-import android.media.MediaPlayer;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.view.ViewPager;
-import android.view.View;
-import android.widget.ImageView;
-import android.widget.ListView;
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
-import android.widget.TextView;
+import android.widget.ListView;
 
 
 public class ListActivity extends AppCompatActivity {
+    ViewPager viewPager;
     private ListView mListTrip;
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -37,7 +34,7 @@ public class ListActivity extends AppCompatActivity {
             return false;
         }
     };
-    ViewPager viewPager;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

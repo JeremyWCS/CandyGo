@@ -459,7 +459,7 @@ public class MainActivity extends AppCompatActivity {
         ListView candyList = popUpView.findViewById(R.id.candy_listview);
         ArrayList<bonbonItemInfoWindow> candyListItem = place.getCandyPlaces();
 
-        CandyAdapter adapter = new CandyAdapter(this, candyListItem);
+        CandyAdapter adapter = new CandyAdapter(this, candyListItem,place.getLevel());
         candyList.setAdapter(adapter);
         final Button getCandy = popUpView.findViewById(R.id.button_get_candy);
 

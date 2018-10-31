@@ -15,7 +15,6 @@ import java.util.ArrayList;
 
 public class CitrouilleAdapter extends ArrayAdapter<CandyModel> {
 
-
     public CitrouilleAdapter(@NonNull Context context, ArrayList<CandyModel> candyList) {
         super(context, 0,candyList);
     }
