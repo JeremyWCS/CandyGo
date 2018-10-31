@@ -2,6 +2,7 @@ package fr.edouardkerhir.geolocmap;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v7.app.AppCompatActivity;
@@ -46,9 +47,9 @@ public class CitrouilleListActivity extends AppCompatActivity {
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
 
-        SharedPreferences sharedPreferences = getSharedPreferences("mypref", MODE_PRIVATE);
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         Gson gson = new Gson();
-        String currentUser = sharedPreferences.getString("currentUser", null);
+        String currentUser = sharedPreferences.getString("currentUser", "");
         UserModel userModel = gson.fromJson(currentUser, UserModel.class);
 
         ListView listView = findViewById(R.id.lv_citrouille);
