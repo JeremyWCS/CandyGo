@@ -3,6 +3,7 @@ package fr.edouardkerhir.geolocmap;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v7.app.AppCompatActivity;
@@ -38,7 +39,7 @@ public class ProfilActivity extends AppCompatActivity {
             return false;
         }
     };
-    private String    json;
+    private String json;
     private TextView tv_nbBonbon;
     private TextView tv_pdBonbon;
     private TextView tvLevel;
@@ -57,7 +58,7 @@ public class ProfilActivity extends AppCompatActivity {
         tv_pdBonbon = findViewById(R.id.tv_pdBonbon);
         tvLevel = findViewById(R.id.tv_level);
 
-        SharedPreferences sharedPreferences = getSharedPreferences("mypref", MODE_PRIVATE);
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         Gson gson = new Gson();
         String currentUser = sharedPreferences.getString("currentUser", null);
         UserModel userModel = gson.fromJson(currentUser, UserModel.class);
@@ -77,39 +78,37 @@ public class ProfilActivity extends AppCompatActivity {
                 startActivity(goToCitrouilleList);
             }
         });
-
-
     }
 
-    public int getlevelUser(){
+    public int getlevelUser() {
 
         UserModel user = new UserModel();
         int nbCandy = user.getCandy();
         int level = 0;
 
-        if (nbCandy<10){
+        if (nbCandy < 20) {
             level = 0;
-        } else if (nbCandy>10 && nbCandy<20) {
+        } else if (nbCandy > 20 && nbCandy < 30) {
             level = 1;
-        } else if (nbCandy>20 && nbCandy<30) {
+        } else if (nbCandy > 30 && nbCandy < 40) {
             level = 3;
-        } else if (nbCandy>30 && nbCandy<40) {
+        } else if (nbCandy > 40 && nbCandy < 50) {
             level = 4;
-        } else if (nbCandy>40 && nbCandy<50) {
+        } else if (nbCandy > 50 && nbCandy < 60) {
             level = 5;
-        } else if (nbCandy>50 && nbCandy<60) {
+        } else if (nbCandy > 60 && nbCandy < 75) {
             level = 6;
-        } else if (nbCandy>60 && nbCandy<70) {
+        } else if (nbCandy > 75 && nbCandy < 90) {
             level = 7;
-        } else if (nbCandy>70 && nbCandy<80) {
+        } else if (nbCandy > 90 && nbCandy < 105) {
             level = 8;
-        } else if (nbCandy>80 && nbCandy<90) {
+        } else if (nbCandy > 105 && nbCandy < 120) {
             level = 9;
-        } else if (nbCandy>90 && nbCandy<100) {
+        } else if (nbCandy > 120 && nbCandy < 140) {
             level = 10;
-        } else if (nbCandy>100) {
+        } else if (nbCandy > 140) {
             level = 11;
         }
-        return  level;
+        return level;
     }
 }
