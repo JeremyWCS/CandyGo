@@ -62,8 +62,6 @@ import org.json.JSONObject;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 
-import static java.util.Arrays.asList;
-
 public class MainActivity extends AppCompatActivity {
     final static double TOULOUSE_LATITUDE = 43.6043;
     final static double TOULOUSE_LONGITUDE = 1.4437;
@@ -88,6 +86,7 @@ public class MainActivity extends AppCompatActivity {
     private ArrayList<Marker> mMarkers;
     private UserModel user = new UserModel();
     private String placeAdressJsonString;
+
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
         @Override
@@ -309,10 +308,6 @@ public class MainActivity extends AppCompatActivity {
 
     public void requeteAPI(String urlRequete) {
         // Création de la requête vers l'API, ajout des écouteurs pour les réponses et erreurs possibles
-
-
-
-
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
                 Request.Method.GET, urlRequete, null,
                 new Response.Listener<JSONObject>() {
@@ -341,13 +336,9 @@ public class MainActivity extends AppCompatActivity {
                                         case 2: index = (int) (Math.random()*9+1); break;
                                         case 3: index = (int) (Math.random()*9+1); break;
                                     }
-
-
                                     int nbForIndex = (int) (Math.random()*3+2);
                                     candyThisPlace.add(new bonbonItemInfoWindow(index, nbForIndex));
                                 }
-
-
                                 placesAdresses.add(new Places(name, adress, longitude, latitude, nbCandy, candyThisPlace, levelPlace));
                             }
                             SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(MainActivity.this);
@@ -355,21 +346,17 @@ public class MainActivity extends AppCompatActivity {
                             editor.putInt("placesJsonNb", placesAdresses.size());
                             Gson gson = new Gson();
 
-                            if (placeAdressJsonString.isEmpty()){
+                            if (placeAdressJsonString.isEmpty()) {
                                 placeAdressJsonString = gson.toJson(placesAdresses);
                                 editor = sharedPreferences.edit();
                                 editor.putString("placesJson", placeAdressJsonString);
                                 editor.commit();
                                 createMarkers(placesAdresses);
-                            }
-                            else {
+                            } else {
 
-                                Type listType = new TypeToken<ArrayList<Places>>(){}.getType();
-
-
-                                placesAdresses = (gson.fromJson(placeAdressJsonString,listType));
-
-
+                                Type listType = new TypeToken<ArrayList<Places>>() {
+                                }.getType();
+                                placesAdresses = (gson.fromJson(placeAdressJsonString, listType));
                                 boolean bool = true;
                                 createMarkers(placesAdresses);
                             }
@@ -389,7 +376,6 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
         );
-
         // On ajoute la requête à la file d'attente
         requestQueue.add(jsonObjectRequest);
     }
@@ -401,6 +387,7 @@ public class MainActivity extends AppCompatActivity {
             MarkerOptions markerOptions = new MarkerOptions();
             markerOptions.position(PlacePosition);
             Marker marker = superMap.addMarker(markerOptions);
+
             BitmapDescriptor icon = BitmapDescriptorFactory.fromResource(R.drawable.candyiconcolor);
             if(!thisPlace.isVisited()){
                 switch(thisPlace.getLevel()){
@@ -414,13 +401,10 @@ public class MainActivity extends AppCompatActivity {
                         icon = BitmapDescriptorFactory.fromResource(R.drawable.candyicongold);
                         break;
                 }
-
             }
             else {
                 icon = BitmapDescriptorFactory.fromResource(R.drawable.candyiconblur);
             }
-
-
             marker.setIcon(icon);
             marker.setTag(thisPlace);
             mMarkers.add(marker);
@@ -466,7 +450,7 @@ public class MainActivity extends AppCompatActivity {
         candyList.setAdapter(adapter);
         final Button getCandy = popUpView.findViewById(R.id.button_get_candy);
 
-        if (place.isVisited()){
+        if (place.isVisited()) {
             getCandy.setText("tu as déjà récupéré ces bonbons fdp!");
         }
 
@@ -474,8 +458,18 @@ public class MainActivity extends AppCompatActivity {
         getCandy.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                if (place.isVisited()) {
+                SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(MainActivity.this);
+                Gson gson = new Gson();
+                String currentUser = sharedPreferences.getString("currentUser", null);
+                UserModel userModel = gson.fromJson(currentUser, UserModel.class);
+                userModel.setLevel(getlevelUser());
+                if (place.getLevel() == 2 && userModel.getLevel() < 4) {
+                    Toast.makeText(MainActivity.this, "Pas le level !", Toast.LENGTH_LONG).show();
+                    popUp.dismiss();
+                }else if(place.getLevel() == 3 && userModel.getLevel() < 9) {
+                    Toast.makeText(MainActivity.this, "Pas le level !", Toast.LENGTH_LONG).show();
+                    popUp.dismiss();
+                }else if(place.isVisited()) {
 
                 } else {
                     if (getDistanceFromMarker(marker) < DISTANCE_POUR_CHOPPER_LES_BONBONS) {
@@ -483,9 +477,8 @@ public class MainActivity extends AppCompatActivity {
                         BitmapDescriptor icon = BitmapDescriptorFactory.fromResource(R.drawable.candyiconblur);
                         marker.setIcon(icon);
                         place.setVisited(true);
-                        Gson gson = new Gson();
                         placeAdressJsonString = gson.toJson(placesAdresses);
-                        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(MainActivity.this);
+                        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(MainActivity.this);
                         SharedPreferences.Editor editor = sharedPreferences.edit();
                         editor = sharedPreferences.edit();
                         editor.putString("placesJson", placeAdressJsonString);
@@ -499,6 +492,38 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
+    public int getlevelUser() {
+
+        UserModel user = new UserModel();
+        int nbCandy = user.getCandy();
+        int level = 0;
+
+        if (nbCandy < 20) {
+            level = 0;
+        } else if (nbCandy > 20 && nbCandy < 30) {
+            level = 1;
+        } else if (nbCandy > 30 && nbCandy < 40) {
+            level = 3;
+        } else if (nbCandy > 40 && nbCandy < 50) {
+            level = 4;
+        } else if (nbCandy > 50 && nbCandy < 60) {
+            level = 5;
+        } else if (nbCandy > 60 && nbCandy < 75) {
+            level = 6;
+        } else if (nbCandy > 75 && nbCandy < 90) {
+            level = 7;
+        } else if (nbCandy > 90 && nbCandy < 105) {
+            level = 8;
+        } else if (nbCandy > 105 && nbCandy < 120) {
+            level = 9;
+        } else if (nbCandy > 120 && nbCandy < 140) {
+            level = 10;
+        } else if (nbCandy > 140) {
+            level = 11;
+        }
+        return level;
+    }
+
 
     public float getDistanceFromMarker(Marker marker) {
         float distance;

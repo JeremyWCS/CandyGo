@@ -46,8 +46,6 @@ public class ListActivity extends AppCompatActivity {
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
         getCandy();
-      /*  poidBuilder(1);
-        addListenerOnSlider(viewPager);*/
     }
 
     public void getCandy() {
