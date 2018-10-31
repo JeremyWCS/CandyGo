@@ -412,14 +412,16 @@ public class MainActivity extends AppCompatActivity {
                         icon = BitmapDescriptorFactory.fromResource(R.drawable.candyicongold);
                         break;
                 }
+
             }
             else {
-                icon = BitmapDescriptorFactory.fromResource(R.drawable.candyiconblur);
+                icon = BitmapDescriptorFactory.fromResource(R.drawable.emptylittle);
             }
             marker.setIcon(icon);
             marker.setTag(thisPlace);
             mMarkers.add(marker);
             boolean focus = false;
+
         }
 
         superMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
@@ -485,8 +487,8 @@ public class MainActivity extends AppCompatActivity {
                 } else {
                     if (getDistanceFromMarker(marker) < DISTANCE_POUR_CHOPPER_LES_BONBONS) {
                         Toast.makeText(MainActivity.this, "Tu es suffisament proche !", Toast.LENGTH_LONG).show();
-                        BitmapDescriptor icon = BitmapDescriptorFactory.fromResource(R.drawable.candyiconblur);
-                        marker.setIcon(null);
+                        BitmapDescriptor icon = BitmapDescriptorFactory.fromResource(R.drawable.emptylittle);
+                        marker.setIcon(icon);
                         place.setVisited(true);
                         placeAdressJsonString = gson.toJson(placesAdresses);
                         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(MainActivity.this);
