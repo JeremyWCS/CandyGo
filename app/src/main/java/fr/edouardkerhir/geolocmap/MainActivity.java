@@ -69,7 +69,7 @@ public class MainActivity extends AppCompatActivity {
     final static double TOULOUSE_LONGITUDE_BORDURES_BOT = 1.411854;
     final static double TOULOUSE_LATITUDE_BORDURES_TOP = 43.642094;
     final static double TOULOUSE_LONGITUDE_BORDURES_TOP = 1.480995;
-    final static int DISTANCE_POUR_CHOPPER_LES_BONBONS = 50;
+    final static int DISTANCE_POUR_CHOPPER_LES_BONBONS = 500000;
 
     final static int ZOOM_LVL_BY_DEFAULT = 13;
 
@@ -475,7 +475,7 @@ public class MainActivity extends AppCompatActivity {
                 Gson gson = new Gson();
                 String currentUser = sharedPreferences.getString("currentUser", null);
                 UserModel user = gson.fromJson(currentUser, UserModel.class);
-                //user.setLevel(getlevelUser());
+                user.setLevel(user.getCandy());
                 if (place.getLevel() == 2 && user.getLevel() < 4) {
                     Toast.makeText(MainActivity.this, "Niveau 4 nécessaire !", Toast.LENGTH_LONG).show();
                     popUp.dismiss();
@@ -523,10 +523,8 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
-    public int getlevelUser() {
+    public int getlevelUser(int nbCandy) {
 
-        UserModel user = new UserModel();
-        int nbCandy = user.getCandy();
         int level = 0;
 
         if (nbCandy < 20) {
