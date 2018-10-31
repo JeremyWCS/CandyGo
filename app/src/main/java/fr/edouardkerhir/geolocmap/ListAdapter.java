@@ -77,7 +77,7 @@ public class ListAdapter extends ArrayAdapter<CandyModel> {
                 if (position == 1) {
                     totalPoid = totalPoid * 2;
                 }else if (position == 2) {
-                    totalPoid = totalPoid * 5;
+                    totalPoid = totalPoid * 4;
                 }
                 finalViewHolder1.poidCandy.setText(String.valueOf(totalPoid));
             }
