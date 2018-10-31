@@ -50,5 +50,4 @@ class CandyAdapter extends ArrayAdapter<bonbonItemInfoWindow> {
 
         return convertView;
     }
-
 }
