@@ -42,6 +42,7 @@ public class CitrouilleListActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_citrouille_list);
+
         setTitle("Ma Panier");
 
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);

@@ -114,6 +114,7 @@ public class MainActivity extends AppCompatActivity {
         mZoom = 17.0f;
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 
         //create shared pref object
@@ -462,11 +463,7 @@ public class MainActivity extends AppCompatActivity {
         CandyAdapter adapter = new CandyAdapter(this, candyListItem,place.getLevel());
         candyList.setAdapter(adapter);
         final Button getCandy = popUpView.findViewById(R.id.button_get_candy);
-
-        if (place.isVisited()) {
-            getCandy.setText("tu as déjà récupéré ces bonbons fdp!");
-        }
-
+        getCandy.setBackgroundResource(R.drawable.button_design);
 
         getCandy.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -486,7 +483,7 @@ public class MainActivity extends AppCompatActivity {
 
                 } else {
                     if (getDistanceFromMarker(marker) < DISTANCE_POUR_CHOPPER_LES_BONBONS) {
-                        Toast.makeText(MainActivity.this, "Tu es suffisament proche !", Toast.LENGTH_LONG).show();
+                        Toast.makeText(MainActivity.this, "Bonbons récupérés !", Toast.LENGTH_LONG).show();
                         BitmapDescriptor icon = BitmapDescriptorFactory.fromResource(R.drawable.emptylittle);
                         marker.setIcon(icon);
                         place.setVisited(true);
@@ -555,7 +552,6 @@ public class MainActivity extends AppCompatActivity {
         thisPlaceLocation.setLatitude(thisPlace.getLatitude());
         thisPlaceLocation.setLongitude(thisPlace.getLongitude());
         distance = thisPlaceLocation.distanceTo(userLocation);
-
         return distance;
     }
 
