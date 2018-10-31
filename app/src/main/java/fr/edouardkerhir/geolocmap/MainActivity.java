@@ -327,13 +327,18 @@ public class MainActivity extends AppCompatActivity {
                                 double latitude = coordinates.getDouble(1);
                                 int nbCandy = (int) (Math.random() * 4 + 1);
                                 ArrayList<bonbonItemInfoWindow> candyThisPlace = new ArrayList<>();
-                                for (int j = 0; j < nbCandy; j++) {
-                                    int index = (int) (Math.random() * 9 + 1);
-                                    int nbForIndex = (int) (Math.random() * 3 + 2);
+                                int levelPlace = (int) (Math.random()*3+1);
+                                int index = 0;
+                                for (int j=0; j<nbCandy; j++){
+                                    switch(nbCandy){
+                                        case 1: index = (int) (Math.random()*9+1); break;
+                                        case 2: index = (int) (Math.random()*9+1); break;
+                                        case 3: index = (int) (Math.random()*9+1); break;
+                                    }
+                                    int nbForIndex = (int) (Math.random()*3+2);
                                     candyThisPlace.add(new bonbonItemInfoWindow(index, nbForIndex));
                                 }
-
-                                placesAdresses.add(new Places(name, adress, longitude, latitude, nbCandy, candyThisPlace));
+                                placesAdresses.add(new Places(name, adress, longitude, latitude, nbCandy, candyThisPlace, levelPlace));
                             }
                             SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(MainActivity.this);
                             SharedPreferences.Editor editor = sharedPreferences.edit();
@@ -350,11 +355,7 @@ public class MainActivity extends AppCompatActivity {
 
                                 Type listType = new TypeToken<ArrayList<Places>>() {
                                 }.getType();
-
-
                                 placesAdresses = (gson.fromJson(placeAdressJsonString, listType));
-
-
                                 boolean bool = true;
                                 createMarkers(placesAdresses);
                             }
@@ -374,7 +375,6 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
         );
-
         // On ajoute la requête à la file d'attente
         requestQueue.add(jsonObjectRequest);
     }
@@ -386,11 +386,23 @@ public class MainActivity extends AppCompatActivity {
             MarkerOptions markerOptions = new MarkerOptions();
             markerOptions.position(PlacePosition);
             Marker marker = superMap.addMarker(markerOptions);
-            BitmapDescriptor icon;
-            if (!thisPlace.isVisited()) {
-                icon = BitmapDescriptorFactory.fromResource(R.drawable.candyiconcolor);
-            } else {
-                icon = BitmapDescriptorFactory.fromResource(R.drawable.candyicongrey);
+
+            BitmapDescriptor icon = BitmapDescriptorFactory.fromResource(R.drawable.candyiconcolor);
+            if(!thisPlace.isVisited()){
+                switch(thisPlace.getLevel()){
+                    case 1:
+                        icon = BitmapDescriptorFactory.fromResource(R.drawable.candyiconbronze);
+                        break;
+                    case 2:
+                        icon = BitmapDescriptorFactory.fromResource(R.drawable.candyicongrey);
+                        break;
+                    case 3:
+                        icon = BitmapDescriptorFactory.fromResource(R.drawable.candyicongold);
+                        break;
+                }
+            }
+            else {
+                icon = BitmapDescriptorFactory.fromResource(R.drawable.candyiconblur);
             }
             marker.setIcon(icon);
             marker.setTag(thisPlace);
@@ -445,18 +457,27 @@ public class MainActivity extends AppCompatActivity {
         getCandy.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                if (place.isVisited()) {
+                SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(MainActivity.this);
+                Gson gson = new Gson();
+                String currentUser = sharedPreferences.getString("currentUser", null);
+                UserModel userModel = gson.fromJson(currentUser, UserModel.class);
+                userModel.setLevel(getlevelUser());
+                if (place.getLevel() == 2 && userModel.getLevel() < 4) {
+                    Toast.makeText(MainActivity.this, "Pas le level !", Toast.LENGTH_LONG).show();
+                    popUp.dismiss();
+                }else if(place.getLevel() == 3 && userModel.getLevel() < 9) {
+                    Toast.makeText(MainActivity.this, "Pas le level !", Toast.LENGTH_LONG).show();
+                    popUp.dismiss();
+                }else if(place.isVisited()) {
 
                 } else {
                     if (getDistanceFromMarker(marker) < DISTANCE_POUR_CHOPPER_LES_BONBONS) {
                         Toast.makeText(MainActivity.this, "Tu es suffisament proche !", Toast.LENGTH_LONG).show();
-                        BitmapDescriptor icon = BitmapDescriptorFactory.fromResource(R.drawable.candyicongrey);
+                        BitmapDescriptor icon = BitmapDescriptorFactory.fromResource(R.drawable.candyiconblur);
                         marker.setIcon(icon);
                         place.setVisited(true);
-                        Gson gson = new Gson();
                         placeAdressJsonString = gson.toJson(placesAdresses);
-                        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(MainActivity.this);
+                        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(MainActivity.this);
                         SharedPreferences.Editor editor = sharedPreferences.edit();
                         editor = sharedPreferences.edit();
                         editor.putString("placesJson", placeAdressJsonString);
@@ -470,6 +491,38 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
+    public int getlevelUser() {
+
+        UserModel user = new UserModel();
+        int nbCandy = user.getCandy();
+        int level = 0;
+
+        if (nbCandy < 20) {
+            level = 0;
+        } else if (nbCandy > 20 && nbCandy < 30) {
+            level = 1;
+        } else if (nbCandy > 30 && nbCandy < 40) {
+            level = 3;
+        } else if (nbCandy > 40 && nbCandy < 50) {
+            level = 4;
+        } else if (nbCandy > 50 && nbCandy < 60) {
+            level = 5;
+        } else if (nbCandy > 60 && nbCandy < 75) {
+            level = 6;
+        } else if (nbCandy > 75 && nbCandy < 90) {
+            level = 7;
+        } else if (nbCandy > 90 && nbCandy < 105) {
+            level = 8;
+        } else if (nbCandy > 105 && nbCandy < 120) {
+            level = 9;
+        } else if (nbCandy > 120 && nbCandy < 140) {
+            level = 10;
+        } else if (nbCandy > 140) {
+            level = 11;
+        }
+        return level;
+    }
+
 
     public float getDistanceFromMarker(Marker marker) {
         float distance;
