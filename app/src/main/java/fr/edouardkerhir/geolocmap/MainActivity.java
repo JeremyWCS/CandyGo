@@ -344,11 +344,17 @@ public class MainActivity extends AppCompatActivity {
                                 int index = 0;
                                 for (int j=0; j<nbCandy; j++){
                                     switch(nbCandy){
-                                        case 1: index = (int) (Math.random()*9+1); break;
-                                        case 2: index = (int) (Math.random()*9+1); break;
-                                        case 3: index = (int) (Math.random()*9+1); break;
+                                        case 1: index = (int) (Math.random()*8+1); break;
+                                        case 2: index = (int) (Math.random()*8+1); break;
+                                        case 3: index = (int) (Math.random()*8+1); break;
                                     }
-                                    int nbForIndex = (int) (Math.random()*3+2);
+                                    int nbForIndex = 0;
+                                    switch(levelPlace){
+                                        case 1: nbForIndex = (int) (Math.random()*3+2); break;
+                                        case 2: nbForIndex =  (int) (Math.random()*4+3); break;
+                                        case 3: nbForIndex =  (int) (Math.random()*5+5); break;
+                                    }
+
                                     candyThisPlace.add(new bonbonItemInfoWindow(index, nbForIndex));
                                 }
                                 placesAdresses.add(new Places(name, adress, longitude, latitude, nbCandy, candyThisPlace, levelPlace));
@@ -498,14 +504,14 @@ public class MainActivity extends AppCompatActivity {
                             int numberOfEach = place.getCandyPlaces().get(i).getNbEachCandy();
                             user.setCandy(user.getCandy()+numberOfEach);
                             ArrayList<CandyModel> tempArray = user.getUsersCandies();
-                            ArrayList<CandyModel> tempArray1 = user.getUsersCandies1();
-                            ArrayList<CandyModel> tempArray2 = user.getUsersCandies2();
+                            /*ArrayList<CandyModel> tempArray1 = user.getUsersCandies1();
+                            ArrayList<CandyModel> tempArray2 = user.getUsersCandies2();*/
                             tempArray.get(indexSingleton).setNbCandy(tempArray.get(indexSingleton).getNbCandy()+numberOfEach);
                             user.setUsersCandies(tempArray);
-                            tempArray1.get(indexSingleton).setNbCandy(tempArray1.get(indexSingleton).getNbCandy()+numberOfEach);
+                            /*tempArray1.get(indexSingleton).setNbCandy(tempArray1.get(indexSingleton).getNbCandy()+numberOfEach);
                             user.setUsersCandies1(tempArray1);
                             tempArray2.get(indexSingleton).setNbCandy(tempArray2.get(indexSingleton).getNbCandy()+numberOfEach);
-                            user.setUsersCandies2(tempArray2);
+                            user.setUsersCandies2(tempArray2);*/
                             userJson = gson.toJson(user);
                             editor.putString("currentUser", userJson);
                             editor.commit();
