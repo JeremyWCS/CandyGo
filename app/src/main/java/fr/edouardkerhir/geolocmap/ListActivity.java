@@ -46,10 +46,8 @@ public class ListActivity extends AppCompatActivity {
     }
 
     public void getCandy() {
-
         ListAdapter adapter = new ListAdapter(ListActivity.this, CandySingleton.getInstance().getCandyArrayList());
         mListTrip = findViewById(R.id.candy_list);
         mListTrip.setAdapter(adapter);
-
     }
 }

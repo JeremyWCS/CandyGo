@@ -9,7 +9,7 @@ public class CandyModel {
     public CandyModel(String nom, int image, double poids) {
         this.nom = nom;
         this.poids = poids;
-        this.image=image;
+        this.image = image;
     }
 
     public CandyModel() {

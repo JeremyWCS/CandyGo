@@ -498,8 +498,14 @@ public class MainActivity extends AppCompatActivity {
                             int numberOfEach = place.getCandyPlaces().get(i).getNbEachCandy();
                             user.setCandy(user.getCandy()+numberOfEach);
                             ArrayList<CandyModel> tempArray = user.getUsersCandies();
+                            ArrayList<CandyModel> tempArray1 = user.getUsersCandies1();
+                            ArrayList<CandyModel> tempArray2 = user.getUsersCandies2();
                             tempArray.get(indexSingleton).setNbCandy(tempArray.get(indexSingleton).getNbCandy()+numberOfEach);
                             user.setUsersCandies(tempArray);
+                            tempArray1.get(indexSingleton).setNbCandy(tempArray1.get(indexSingleton).getNbCandy()+numberOfEach);
+                            user.setUsersCandies1(tempArray1);
+                            tempArray2.get(indexSingleton).setNbCandy(tempArray2.get(indexSingleton).getNbCandy()+numberOfEach);
+                            user.setUsersCandies2(tempArray2);
                             userJson = gson.toJson(user);
                             editor.putString("currentUser", userJson);
                             editor.commit();

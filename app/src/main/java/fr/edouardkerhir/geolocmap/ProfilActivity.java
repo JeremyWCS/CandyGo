@@ -2,10 +2,12 @@ package fr.edouardkerhir.geolocmap;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 import android.view.View;
@@ -15,6 +17,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.google.gson.Gson;
+
+import java.util.ArrayList;
 
 public class ProfilActivity extends AppCompatActivity {
 
@@ -59,8 +63,6 @@ public class ProfilActivity extends AppCompatActivity {
         tv_nbBonbon = findViewById(R.id.tv_nbBonbon);
         tv_pdBonbon = findViewById(R.id.tv_pdBonbon);
         tvLevel = findViewById(R.id.tv_level);
-        ImageView imageLevel = findViewById(R.id.iv_candy);
-
 
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         Gson gson = new Gson();
@@ -69,8 +71,25 @@ public class ProfilActivity extends AppCompatActivity {
 
         userModel.setLevel(getlevelUser(userModel.getCandy()));
         int nbBonbon = userModel.getCandy();
-        double pdBonbon = userModel.getPoid();
-        tv_nbBonbon.setText("Vous avez " + nbBonbon + " bonbons!");
+        ArrayList<CandyModel> userCandyList= userModel.getUsersCandies();
+        double pdBonbon = nbBonbon*userModel.getPoid();
+
+        for (CandyModel candies : userCandyList) {
+             pdBonbon += candies.getNbCandy()*candies.getPoids();
+        }
+        ImageView ivPoids = findViewById(R.id.iv_pd);
+        if(pdBonbon>0 && pdBonbon<=50){
+            Drawable image1 = ContextCompat.getDrawable(getApplicationContext(), R.drawable.petite_citrouille);
+            ivPoids.setImageDrawable(image1);
+        } else if (pdBonbon>0 && pdBonbon<=200){
+            Drawable image2 = ContextCompat.getDrawable(getApplicationContext(), R.drawable.moy_citrouille);
+            ivPoids.setImageDrawable(image2);
+        } else if (pdBonbon>0 && pdBonbon<=400){
+            Drawable image3 = ContextCompat.getDrawable(getApplicationContext(), R.drawable.grosse_citrouille);
+            ivPoids.setImageDrawable(image3);
+        }
+
+            tv_nbBonbon.setText("Vous avez " + nbBonbon + " bonbons!");
         tv_pdBonbon.setText("Vous avez un poids de " + pdBonbon + "g de bonbons!");
         tvLevel.setText(String.valueOf(userModel.getLevel()));
 
