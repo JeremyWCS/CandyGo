@@ -3,6 +3,7 @@ package fr.edouardkerhir.geolocmap;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v7.app.AppCompatActivity;
@@ -57,7 +58,8 @@ public class ProfilActivity extends AppCompatActivity {
         tv_pdBonbon = findViewById(R.id.tv_pdBonbon);
         tvLevel = findViewById(R.id.tv_level);
 
-        SharedPreferences sharedPreferences = getSharedPreferences("mypref", MODE_PRIVATE);
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+
         Gson gson = new Gson();
         String currentUser = sharedPreferences.getString("currentUser", null);
         UserModel userModel = gson.fromJson(currentUser, UserModel.class);

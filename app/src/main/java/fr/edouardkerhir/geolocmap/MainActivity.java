@@ -88,6 +88,7 @@ public class MainActivity extends AppCompatActivity {
     private ArrayList<Marker> mMarkers;
     private UserModel user = new UserModel();
     private String placeAdressJsonString;
+
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
         @Override
